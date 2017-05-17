@@ -2,7 +2,14 @@
 library(dplyr)
 require(dplyr)
 
-# Load the refine.csv file into a dataframe df_refine
+######################################################################################################
+# 0: LOAD THE DATA IN RSTUDIO
+# Load data into dataframe titanic3.csv using 2 approaches. 
+# In the first approach, all the blank values for all columns are replaced by NA. Further operations on this
+# are easier and efficient with this approach. This approach is commented in below code. 
+# In the second approach, blank values are retained 
+######################################################################################################
+
 #df_titanic <-read.csv("titanic3.csv",na.strings=c("", "NA"), header = TRUE)
 df_titanic <-read.csv("titanic3.csv", header = TRUE)
 
@@ -21,6 +28,17 @@ df_titanic$embarked <- as.factor(df_titanic$embarked)
 #   2: AGE 
 # Populate missing values in AGE column. Replace with mean value and other methods.
 ######################################################################################################
+
+avg_age <- mean(df_titanic$age,na.rm = TRUE)
+print(avg_age)
+df_titanic <-df_titanic %>% 
+  mutate("age" = ifelse(is.na(age)==TRUE,avg_age,age))
+
+#average age to be populated by checking for 'master'. If name contains 'master', average age is 6.5. Else
+# average age will be the average age amongst all passengers onboard. 
+# DOUBT: How to make the combination of filter and mutate work. Rather, how to write code for more than one 
+# condition (on more than one column)
+
 #avg_master <- mean(c(0:13))
 #print(avg_master)
 #df_titanic$age <- as.numeric(df_titanic$age)
@@ -29,10 +47,6 @@ df_titanic$embarked <- as.factor(df_titanic$embarked)
 #          mutate("age" = ifelse(is.na(age)==TRUE,avg_master,age))
 #View(df_titanic)
 
-avg_age <- mean(df_titanic$age,na.rm = TRUE)
-print(avg_age)
-df_titanic <-df_titanic %>% 
-            mutate("age" = ifelse(is.na(age)==TRUE,avg_age,age))
 
 ######################################################################################################
 #   3: LIFE BOAT
@@ -54,7 +68,12 @@ df_titanic <- df_titanic %>%
         mutate("has_cabin_number" = ifelse(cabin == "", 0,1))
 ######################################################################################################
 #   5: VIEW THE RESULTS
-# 
-######################################################################################################
+# ######################################################################################################
 
 View(df_titanic)
+
+######################################################################################################
+#   5: WRITE THE OUTPUT
+# ######################################################################################################
+write.csv(df_titanic, file = "titanicnew.csv")
+
